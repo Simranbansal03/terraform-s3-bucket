@@ -1,46 +1,3 @@
-# name: Terraform Deploy
-
-# on:
-#   push:
-#     branches:
-#       - main
-
-# jobs:
-#   terraform:
-#     name: 'Terraform Apply'
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Setup Terraform
-#         uses: hashicorp/setup-terraform@v2
-#         with:
-#           terraform_version: 1.5.7
-
-#       - name: Terraform Init
-#         run: terraform init
-#         working-directory: ./terraform
-#         env:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-#       - name: Terraform Plan
-#         run: terraform plan
-#         working-directory: ./terraform
-#         env:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-#       - name: Terraform Apply
-#         run: terraform apply -auto-approve
-#         working-directory: ./terraform
-#         env:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-
 name: Terraform Deploy
 
 on:
@@ -50,53 +7,35 @@ on:
 
 jobs:
   terraform:
+    name: 'Terraform Apply'
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents current directory and files      contents: read
-        run: |
-          pwd
-          ls -la
-          ls -la ./terraform
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::648226162307:role/terraformdeploy
-          aws-region: us-east-1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
 
-      - name: Set Terraform Debug Logging
-        run: |
-          echo "TF_LOG=DEBUG" >> $GITHUB_ENV
-          echo "TF_LOG_PATH=$GITHUB_WORKSPACE/terraform-debug.log" >> $GITHUB_ENV
-
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Terraform Plan
         run: terraform plan
         working-directory: ./terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: ./terraform
-
-      - name: Upload Terraform Debug Log
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-debug-log
-          path: terraform-debug.log
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-
-          
-
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
