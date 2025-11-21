@@ -41,16 +41,8 @@
 #           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 
-name: Terraform Deploy
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   terraform:
-    name: 'Terraform Apply'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -59,8 +51,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        List files        with:
+        run: ls -R
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -84,6 +76,9 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: ./terraform
+          fetch-depth: 0
+
+
 
       - name: Terraform Plan
         run: terraform plan
