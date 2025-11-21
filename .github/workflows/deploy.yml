@@ -51,7 +51,10 @@ on:
 jobs:
   terraform:
     name: 'Terraform Apply'
-    runs-on: ubuntu      contents: read    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -60,7 +63,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/GitHubActionsTerraformRole
+          role-to-assume: arn:aws:iam::648226162307:role/terraformdeploy
           aws-region: us-east-1
 
       - name: Setup Terraform
@@ -78,7 +81,3 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
-        working-directory: ./terraform
-    permissions:
-      id-token: write
-
