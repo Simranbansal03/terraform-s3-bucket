@@ -56,33 +56,61 @@ jobs:
       contents: read
 
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Debug - List files
-        run: ls -R
+      # Step 2: Debug - Show directory structure
+      - name: Debug - Show current directory and files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Root files:"
+          ls -la
+          echo "Terraform folder contents:"
+          ls -la ./terraform
 
+      # Step 3: Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::648226162307:role/terraformdeploy
           aws-region: us-east-1
 
+      # Step 4: Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
 
+      # Step 5: Enable Terraform Debug Logging
+      - name: Set Terraform Debug Logging
+        run: |
+          echo "TF_LOG=DEBUG" >> $GITHUB_ENV
+          echo "TF_LOG_PATH=$GITHUB_WORKSPACE/terraform-debug.log" >> $GITHUB_ENV
+
+      # Step 6: Terraform Init
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
 
+      # Step 7: Terraform Plan
       - name: Terraform Plan
         run: terraform plan
         working-directory: ./terraform
 
+      # Step 8: Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: ./terraform
+
+      # Step 9: Upload Debug Log as Artifact
+      - name: Upload Terraform Debug Log
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-debug-log
+          path: terraform-debug.log
+          
 
